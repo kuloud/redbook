@@ -1,5 +1,6 @@
 import type { PlasmoCSConfig } from "plasmo"
 import axios from 'redaxios'
+import { getUserInfo } from "~platform/xhs/api";
 
 export const config: PlasmoCSConfig = {
   matches: ["https://www.xiaohongshu.com/user/profile/*"],
@@ -18,17 +19,5 @@ const currentUserId = extractUserId(href)
 console.log('currentUserId: ', currentUserId)
 
 if (currentUserId) {
-  // console.log('--->|')
-  // axios.get(`https://www.xiaohongshu.com/user/profile/${currentUserId}`, {
-  //   responseType: "text"
-  // }).then((res) => {
-  //   console.log('--->', res)
-  //   const doc = new DOMParser().parseFromString(res.data, "text/html")
-  //   console.log('--doc->', doc)
-  // }).catch((err) => {
-  //   console.log('--err->', err)
-  // })
-  // 
-  
-  // const jsonStr = doc.getElementById("__NEXT_DATA__").textContent ?? ""
+  // getUserInfo(currentUserId)
 }

@@ -32,8 +32,10 @@
     "typescript": "5.3.3"
   },
   "manifest": {
+    "permissions": [
+    ],
     "host_permissions": [
-      "https://*/*"
+      "https://www.xiaohongshu.com/*"
     ]
   }
 }

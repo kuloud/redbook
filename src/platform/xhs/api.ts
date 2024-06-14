@@ -1,6 +1,7 @@
 import axios from 'redaxios'
 
 import { Gender, Interaction, UserInfo } from "~data/user"
+import { truncateUrl } from './utils'
 
 const http = axios.create({
     baseURL: "https://www.xiaohongshu.com"
@@ -25,7 +26,7 @@ export async function getUserInfo(uid: string) {
             if (div.className === 'gender') {
                 const useElement = div.querySelector('use');
                 const genderText = div.querySelector<HTMLSpanElement>('.gender-text')?.textContent?.trim() || '';
-                return new Gender(useElement.getAttribute('xlink:href')?.replace('#', '') || '',
+                return new Gender(useElement?.getAttribute('xlink:href')?.replace('#', '') || '',
                     genderText)
             } else {
                 return div?.textContent?.trim() || ''
@@ -43,11 +44,13 @@ export async function getUserInfo(uid: string) {
         const followingText = userElement.querySelector<HTMLSpanElement>('.info-right-area .reds-button-new-text')?.textContent?.trim() || '';
         const following = followingText === '已关注'
 
-        const userInfo = new UserInfo(nickname, redId, avatar, location, description, tags, interactions, following);
+        const userInfo = new UserInfo(nickname, redId, truncateUrl(avatar), location, description, tags, interactions, following);
 
         console.log('--userInfo->', userInfo)
         return userInfo
     }
     return null
 }
+
+
 
