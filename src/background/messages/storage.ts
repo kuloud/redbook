@@ -3,7 +3,6 @@ import * as db from '~data/db'
 
 const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
   const { store, query, value, key, count } = req.body
-  console.log('--->', store, req.body.method, query, value, key, count)
   try {
     switch (req.body.method) {
       case "get":
@@ -16,7 +15,6 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
         break
       case "getAll":
         const allItems = await db.getAllItems(store, query, count) ?? []
-        console.log('----', allItems)
         res.send({
           code: 0,
           message: "success",

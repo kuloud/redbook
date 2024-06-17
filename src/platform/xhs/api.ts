@@ -7,7 +7,7 @@ const http = axios.create({
     baseURL: "https://www.xiaohongshu.com"
 })
 
-export function parseUserInfoByDom(doc: Document): UserInfo | null {
+export function parseUserInfoByDom(doc: Document, uid: string): UserInfo | null {
     const userElement = doc.querySelector('.user-page#userPageContainer .user')
     if (userElement) {
         const avatar = userElement.querySelector<HTMLImageElement>('.avatar-wrapper .user-image')?.src?.trim() || '';
@@ -40,7 +40,7 @@ export function parseUserInfoByDom(doc: Document): UserInfo | null {
         const followingText = userElement.querySelector<HTMLSpanElement>('.info-right-area .reds-button-new-text')?.textContent?.trim() || '';
         const following = followingText === '已关注'
 
-        const userInfo = new UserInfo(nickname, redId, truncateUrl(avatar), location, description, tags, interactions, following);
+        const userInfo = new UserInfo(uid, nickname, redId, truncateUrl(avatar), location, description, tags, interactions, following);
 
         console.log('--userInfo->', userInfo)
         return userInfo
@@ -55,7 +55,7 @@ export async function getUserInfo(uid: string) {
     })
     const doc = new DOMParser().parseFromString(res.data, "text/html")
 
-    return parseUserInfoByDom(doc)
+    return parseUserInfoByDom(doc, uid)
 }
 
 

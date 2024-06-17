@@ -23,7 +23,7 @@ console.log('currentUserId: ', currentUserId)
 relayMessage({ name: "storage" })
 
 if (currentUserId) {
-  const user = parseUserInfoByDom(document)
+  const user = parseUserInfoByDom(document, currentUserId)
   if (user) {
     userStorage.getItem(user.redId).then((userInfo: UserInfo | undefined) => {
       if (userInfo) {

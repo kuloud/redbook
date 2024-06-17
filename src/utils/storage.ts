@@ -19,12 +19,11 @@ const storage = {
     console.log('getItem ---', response)
     return handleResponse(response)
   },
-  getAllItems: async (store: Store, query?: string | IDBKeyRange, count?: number) => {
+  getAllItems: async (store: Store, query?: string | IDBKeyRange, count?: number): Promise<any[]> => {
     const response = await sendToBackgroundViaRelay({
       name: "storage",
       body: { method: "getAll", store, query, count }
     })
-    console.log('>>>', response)
     return handleResponse(response)
   },
   setItem: async (store: Store, value: any, key?: string | IDBKeyRange) => {
@@ -56,7 +55,7 @@ function createStorageNS(store: Store) {
     getItem: async (query: string | IDBKeyRange) => {
       return await storage.getItem(store, query)
     },
-    getAllItems: async (query?: string | IDBKeyRange, count?: number) => {
+    getAllItems: async (query?: string | IDBKeyRange, count?: number): Promise<any[]> => {
       return await storage.getAllItems(store, query, count)
     },
     setItem: async (value: any, key?: string | IDBKeyRange) => {

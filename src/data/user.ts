@@ -29,6 +29,7 @@ export class Interaction {
 }
 
 export class UserInfo {
+    uid: string
     redId: string
     nickname: string
     avatar: string
@@ -37,10 +38,11 @@ export class UserInfo {
     tags: (string | Gender)[]
     interactions: Interaction[]
     following: boolean = false
-    createTime?: Date
-    updateTime?: Date
+    createTime: Date
+    updateTime: Date
 
     constructor(
+        uid: string,
         nickname: string,
         redId: string,
         avatar: string,
@@ -52,6 +54,7 @@ export class UserInfo {
         createTime: Date = new Date(),
         updateTime: Date = new Date()
     ) {
+        this.uid = uid
         this.nickname = nickname;
         this.redId = redId;
         this.avatar = avatar;
@@ -60,7 +63,7 @@ export class UserInfo {
         this.tags = tags;
         this.interactions = interactions;
         this.following = following
-        this.createTime = createTime
-        this.updateTime = updateTime
+        this.createTime = typeof createTime === 'string' ? new Date(createTime) : createTime
+        this.updateTime = typeof updateTime === 'string' ? new Date(updateTime) : updateTime
     }
 }
