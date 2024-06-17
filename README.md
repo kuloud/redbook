@@ -1,4 +1,20 @@
-This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
+浏览器插件，自动归档管理自媒体平台的达人数据。适合小红书、知乎等平台，方便达人/大V关系运维。
+
+<img src="./screenshots/screen.png" width="100%">
+
+
+### 功能列表:
+
+[x] 小红书，访问用户首页，自动归档用户信息（用户民、id、互动数据）到本地数据库
+[x] 小红书，用户数据检索（TODO：标签检索、用户添加&删除）
+[ ] 小红书，访问用户首页，自动归档笔记信息到本地数据库
+[ ] xxx
+
+### `Tips：`
+1. 项目常规功能完全免费开源，遵循 APL2。
+1. 不接收 issue 和 pr，如有咨询或定制需求，可以先扫码支付，然后邮件 [xkuloud@gmail.com](mailto:xkuloud@gmail.com) 说明来意，附上打赏截图（非诚勿扰）
+<img src="./screenshots/alipay.jpg" width="200">
+
 
 ## Getting Started
 
