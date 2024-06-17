@@ -7,11 +7,7 @@ const http = axios.create({
     baseURL: "https://www.xiaohongshu.com"
 })
 
-export async function getUserInfo(uid: string) {
-    const res = await http.get(`/user/profile/${uid}`, {
-        responseType: "text"
-    })
-    const doc = new DOMParser().parseFromString(res.data, "text/html")
+export function parseUserInfoByDom(doc: Document): UserInfo | null {
     const userElement = doc.querySelector('.user-page#userPageContainer .user')
     if (userElement) {
         const avatar = userElement.querySelector<HTMLImageElement>('.avatar-wrapper .user-image')?.src?.trim() || '';
@@ -49,7 +45,17 @@ export async function getUserInfo(uid: string) {
         console.log('--userInfo->', userInfo)
         return userInfo
     }
+
     return null
+}
+
+export async function getUserInfo(uid: string) {
+    const res = await http.get(`/user/profile/${uid}`, {
+        responseType: "text"
+    })
+    const doc = new DOMParser().parseFromString(res.data, "text/html")
+
+    return parseUserInfoByDom(doc)
 }
 
 

@@ -1,6 +1,8 @@
 import type { PlasmoCSConfig } from "plasmo"
-import axios from 'redaxios'
-import { getUserInfo } from "~platform/xhs/api";
+import { parseUserInfoByDom } from "~platform/xhs/api";
+import type { UserInfo } from "~data/user";
+import { userStorage } from "~utils/storage";
+import { relayMessage } from "@plasmohq/messaging";
 
 export const config: PlasmoCSConfig = {
   matches: ["https://www.xiaohongshu.com/user/profile/*"],
@@ -18,6 +20,20 @@ const currentUserId = extractUserId(href)
 
 console.log('currentUserId: ', currentUserId)
 
+relayMessage({ name: "storage" })
+
 if (currentUserId) {
-  // getUserInfo(currentUserId)
+  const user = parseUserInfoByDom(document)
+  if (user) {
+    userStorage.getItem(user.redId).then((userInfo: UserInfo | undefined) => {
+      if (userInfo) {
+        const newUserInfo = { ...userInfo, ...user, createTime: userInfo?.createTime ?? new Date() }
+        userStorage.setItem(newUserInfo)
+      } else {
+        userStorage.setItem(user)
+      }
+    })
+  }
+
 }
+

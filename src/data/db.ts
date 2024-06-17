@@ -1,36 +1,30 @@
 import { openDB, type IDBPDatabase, type DBSchema } from 'idb';
+import type { UserInfo } from './user';
 
 const DB_NAME = 'redbook-extension-db';
 const DB_VERSION = 1;
-const STORE_NAME_PROFILES = 'profiles';
-const STORE_NAME_NOTES = 'notes';
 
-type Store = 'profiles' | 'notes'
+export enum Store {
+    Profiles = 'profiles',
+    Notes = 'notes'
+}
 
 interface RedbookDB extends DBSchema {
-    [STORE_NAME_PROFILES]: {
-        value: {
-            uid: string
-            name: string
-        }
+    [Store.Profiles]: {
+        value: UserInfo
         key: string
-        indexes: {}
     }
-    [STORE_NAME_NOTES]: {
-        value: {
-            uid: string
-            name: string
-        }
+    [Store.Notes]: {
+        value: any
         key: string
-        indexes: {}
     }
 }
 
 const initDB = async (): Promise<IDBPDatabase<RedbookDB>> => {
     return openDB<RedbookDB>(DB_NAME, DB_VERSION, {
         upgrade(db) {
-            const profilesStore = db.createObjectStore(STORE_NAME_PROFILES, {
-                // keyPath: ''
+            const profilesStore = db.createObjectStore(Store.Profiles, {
+                keyPath: 'redId'
             });
             // profilesStore.createIndex()
         }
@@ -40,19 +34,24 @@ const initDB = async (): Promise<IDBPDatabase<RedbookDB>> => {
 export const getDb = async (): Promise<IDBPDatabase<RedbookDB>> => {
     const db = await initDB();
     return db;
-};
+}
 
-export const setItem = async (store: Store, key: string, value: any): Promise<void> => {
+export const getAllItems = async (store: Store, query?: string | IDBKeyRange, count?: number): Promise<any[]> => {
     const db = await getDb();
-    await db.put(store, value, key);
-};
+    return await db.getAll(store, query, count);
+}
 
-export const getItem = async (store: Store, key: string): Promise<any> => {
+export const setItem = async (store: Store, value: any, key?: string | IDBKeyRange,): Promise<string> => {
     const db = await getDb();
-    return await db.get(store, key);
+    return await db.put(store, value, key);
 };
 
-export const deleteItem = async (store: Store, key: string): Promise<void> => {
+export const getItem = async (store: Store, query: string | IDBKeyRange): Promise<any> => {
+    const db = await getDb();
+    return await db.get(store, query);
+};
+
+export const deleteItem = async (store: Store, key: string | IDBKeyRange): Promise<void> => {
     const db = await getDb();
     await db.delete(store, key);
 };
