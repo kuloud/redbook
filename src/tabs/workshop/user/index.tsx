@@ -1,204 +1,321 @@
+import { ManOutlined, WomanOutlined } from "@ant-design/icons"
+import {
+  ModalForm,
+  ProForm,
+  ProFormDateRangePicker,
+  ProFormSelect,
+  ProFormText,
+  ProFormTextArea,
+  ProTable,
+  TableDropdown,
+  type ProColumns
+} from "@ant-design/pro-components"
+import {
+  Avatar,
+  Button,
+  Flex,
+  message,
+  Space,
+  Table,
+  Tag,
+  Typography
+} from "antd"
+import React, { useState } from "react"
 
-import React, { useEffect, useState } from 'react';
-import { Avatar, Button, Flex, Space, Table, Tag, Typography, theme } from 'antd';
-import { Gender, UserInfo } from "~data/user";
-import { ManOutlined, WomanOutlined } from "@ant-design/icons";
-import { LightFilter, ProFormDatePicker, ProFormDateRangePicker, ProTable, TableDropdown, type ProColumns } from '@ant-design/pro-components'
-import { userStorage } from '~utils/storage';
-import { parseFormatNumber } from '~utils/parse';
+import { Gender, UserInfo } from "~data/user"
+import { parseFormatNumber } from "~utils/parse"
+import { userStorage } from "~utils/storage"
 
-const { Text, Link } = Typography
+const { Text } = Typography
 
 function UserPanel() {
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken()
-
-  const [searchKeyword, setSearchKeyword] = useState('')
+  const [modalAddRecord, setModalAddRecord] = useState(false)
 
   const columns: ProColumns<UserInfo>[] = [
     {
-      title: '用户', key: 'base', render: (_, record, index) => <Flex align="center" gap="small">
-        <Avatar src={record.avatar} size={"large"}></Avatar>
-        <Flex vertical>
-          <Text strong>{record.nickname}</Text>
-          <Space>
-            <Text type="secondary">ID:</Text>
-            <Text type="secondary" copyable >{record.redId}</Text>
-          </Space>
+      title: "用户",
+      key: "base",
+      render: (_, record) => (
+        <Flex align="center" gap="small">
+          <Avatar src={record.avatar} size={"large"}></Avatar>
+          <Flex vertical>
+            <Text strong>{record.nickname}</Text>
+            <Space>
+              <Text type="secondary">ID:</Text>
+              <Text type="secondary" copyable>
+                {record.redId}
+              </Text>
+            </Space>
+          </Flex>
         </Flex>
-      </Flex>,
-      fixed: 'left'
+      )
     },
     Table.EXPAND_COLUMN,
     {
-      title: 'IP属地', dataIndex: 'location', key: 'location', fixed: 'left'
+      title: "IP属地",
+      dataIndex: "location",
+      key: "location"
     },
     {
-      title: '标签', dataIndex: 'tags', key: 'tags',
-      render: (_, record, index) => <Space>
-        {Array.isArray(record.tags) && record.tags.map<React.ReactNode>((tag: Gender | string, i) => {
-          if (typeof tag === 'object') {
-            if ('gender' in tag) {
-              const gender = new Gender(tag.gender, tag.genderText)
-              return <Tag key={`tag-gender-${i}`} color={gender.gender === 'male' ? 'blue' : gender.gender === 'female' ? 'red' : null}>
-                {gender.gender === 'male' && <ManOutlined />}
-                {gender.gender === 'female' && <WomanOutlined />}
-                {gender.genderText}
-              </Tag>
-            }
-          } else {
-            return <Tag key={`tag-${i}`}>
-              {tag.toString()}
-            </Tag>
-          }
-
-        })}
-      </Space>, fixed: 'left'
+      title: "标签",
+      dataIndex: "tags",
+      key: "tags",
+      render: (_, record) => (
+        <Space>
+          {Array.isArray(record.tags) &&
+            record.tags.map<React.ReactNode>((tag: Gender | string, i) => {
+              if (typeof tag === "object") {
+                if ("gender" in tag) {
+                  const gender = new Gender(tag.gender, tag.genderText)
+                  return (
+                    <Tag
+                      key={`tag-gender-${i}`}
+                      color={
+                        gender.gender === "male"
+                          ? "blue"
+                          : gender.gender === "female"
+                            ? "red"
+                            : null
+                      }>
+                      {gender.gender === "male" && <ManOutlined />}
+                      {gender.gender === "female" && <WomanOutlined />}
+                      {gender.genderText}
+                    </Tag>
+                  )
+                }
+              } else {
+                return <Tag key={`tag-${i}`}>{tag.toString()}</Tag>
+              }
+            })}
+        </Space>
+      )
     },
     {
-      title: '关注', dataIndex: 'interactions', key: 'follows', hideInSearch: true, render: (_, record, index) => <p>{record.interactions[0]?.count ?? '0'}</p>, fixed: 'left', sorter: (a, b) => parseFormatNumber(a.interactions[0]?.count ?? '0') - parseFormatNumber(b.interactions[0]?.count ?? '0')
-    },
-    {
-      title: '粉丝', dataIndex: 'interactions', key: 'fans',
-      hideInSearch: true, render: (_, record, index) => <p>{record.interactions[1]?.count ?? '0'}</p>, fixed: 'left', sorter: (a, b) => parseFormatNumber(a.interactions[1]?.count ?? '0') - parseFormatNumber(b.interactions[1]?.count ?? '0')
-    },
-    {
-      title: '获赞和收藏', dataIndex: 'interactions', key: 'collected',
-      hideInSearch: true, render: (_, record, index) => <p>{record.interactions[2]?.count ?? '0'}</p>, fixed: 'left', sorter: (a, b) => parseFormatNumber(a.interactions[2]?.count ?? '0') - parseFormatNumber(b.interactions[2]?.count ?? '0')
-    },
-    {
-      title: '创建时间', dataIndex: 'createTime', key: 'create_at', fixed: 'left', search: {
-        transform: (value) => {
-          return {
-            startTime: value[0],
-            endTime: value[1],
-          };
-        },
-      },
-      valueType: 'date',
-      sorter: (a, b) => new Date(a.createTime).getTime() - new Date(b.createTime).getTime(),
+      title: "关注",
+      dataIndex: "interactions",
+      key: "follows",
       hideInSearch: true,
+      render: (_, record) => <p>{record.interactions[0]?.count ?? "0"}</p>,
+      sorter: (a, b) =>
+        parseFormatNumber(a.interactions[0]?.count ?? "0") -
+        parseFormatNumber(b.interactions[0]?.count ?? "0")
     },
     {
-      title: '更新时间', dataIndex: 'updateTime', key: 'updated_at', fixed: 'left', search: {
-        transform: (value) => {
-          return {
-            startTime: value[0],
-            endTime: value[1],
-          };
-        },
-      }, valueType: 'date', sorter: (a, b) => new Date(a.updateTime).getTime() - new Date(b.updateTime).getTime(), hideInSearch: true,
+      title: "粉丝",
+      dataIndex: "interactions",
+      key: "fans",
+      hideInSearch: true,
+      render: (_, record) => <p>{record.interactions[1]?.count ?? "0"}</p>,
+      sorter: (a, b) =>
+        parseFormatNumber(a.interactions[1]?.count ?? "0") -
+        parseFormatNumber(b.interactions[1]?.count ?? "0")
     },
     {
-      title: '操作',
-      valueType: 'option',
-      key: 'option',
+      title: "获赞和收藏",
+      dataIndex: "interactions",
+      key: "collected",
+      hideInSearch: true,
+      render: (_, record) => <p>{record.interactions[2]?.count ?? "0"}</p>,
+      sorter: (a, b) =>
+        parseFormatNumber(a.interactions[2]?.count ?? "0") -
+        parseFormatNumber(b.interactions[2]?.count ?? "0")
+    },
+    {
+      title: "创建时间",
+      dataIndex: "createTime",
+      key: "create_at",
+      valueType: "date",
+      sorter: (a, b) =>
+        new Date(a.createTime).getTime() - new Date(b.createTime).getTime(),
+      hideInSearch: true
+    },
+    {
+      title: "时间范围",
+      key: "dateRange",
+      dataIndex: "createTime",
+      hideInTable: true,
+      valueType: "dateRange",
+      fieldProps: {
+        // placeholder: []
+      },
+      renderFormItem: (_, { type, defaultRender }) => {
+        if (type === "form") {
+          return null
+        }
+
+        return defaultRender(_)
+      }
+    },
+    {
+      title: "更新时间",
+      dataIndex: "updateTime",
+      key: "updated_at",
+      valueType: "date",
+      sorter: (a, b) =>
+        new Date(a.updateTime).getTime() - new Date(b.updateTime).getTime(),
+      hideInSearch: true
+    },
+    {
+      title: "操作",
+      valueType: "option",
+      key: "option",
       hideInSearch: true,
       render: (text, record, _, action) => [
-        <a href={`https://www.xiaohongshu.com/user/profile/${record.uid}`} target="_blank" rel="noopener noreferrer" key="view">
+        <a
+          href={`https://www.xiaohongshu.com/user/profile/${record.uid}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          key="view">
           查看
         </a>,
         <TableDropdown
           key="actionGroup"
-          onSelect={() => action?.reload()}
+          onSelect={(key: string) => {
+            if (key === "delete") {
+              userStorage.removeItem(record.redId).then(() => {
+                message.success("记录已删除")
+                action?.reload()
+              })
+            } else {
+              const recordString = JSON.stringify(record, null, 2)
+              navigator.clipboard
+                .writeText(recordString)
+                .then(() => {
+                  message.success("记录已复制到剪贴板")
+                })
+                .catch((err) => {
+                  message.error("复制失败")
+                  console.error("Could not copy text: ", err)
+                })
+            }
+          }}
           menus={[
-            { key: 'copy', name: '复制' },
-            { key: 'delete', name: '删除' },
+            { key: "copy", name: "复制" },
+            { key: "delete", name: "删除" }
           ]}
-        />,
-      ],
-    },
+        />
+      ]
+    }
   ]
 
   return (
-    <Flex vertical gap={16}>
-
-      <ProTable<UserInfo> columns={columns} expandable={{
-        expandedRowRender: (record) => <Text style={{ whiteSpace: 'pre-wrap' }}>{record.description}</Text>,
-      }}
+    <>
+      <ProTable<UserInfo>
+        columns={columns}
+        expandable={{
+          expandedRowRender: (record) => (
+            <Text style={{ whiteSpace: "pre-wrap" }}>{record.description}</Text>
+          )
+        }}
         request={async (params, sorter, filter) => {
           try {
             const items = await userStorage.getAllItems()
             if (Array.isArray(items)) {
-              const filteredItems = filterData(items, params, sorter, filter);
-              const users = filteredItems.map(user => ({ ...user, key: user.redId }))
-              // console.log('-->', users)
+              const filteredItems = filterData(items, params, sorter, filter)
+              const users = filteredItems.map((user) => ({
+                ...user,
+                key: user.redId
+              }))
               return Promise.resolve({
                 data: users,
-                success: true,
+                success: true
               })
             } else {
               Promise.resolve({
                 data: [],
-                success: true,
+                success: true
               })
             }
-
           } catch (error) {
             console.error(error)
             return Promise.reject({
               data: [],
-              success: false,
+              success: false
             })
           }
-
         }}
         toolbar={{
-          filter: (
-            <LightFilter>
-              <ProFormDateRangePicker name={"dateRange"} label={"时间范围"} />
-            </LightFilter>
-          ),
           actions: [
-            // <Button
-            //   key="primary"
-            //   type="primary"
-            //   onClick={() => {
-            //     alert('add');
-            //   }}
-            // >
-            //   添加
-            // </Button>,
-          ],
+            <Button
+              key="primary"
+              type="primary"
+              onClick={() => {
+                setModalAddRecord(true)
+              }}>
+              添加
+            </Button>
+          ]
         }}
         rowKey="key"
       />
-    </Flex>
+      <ModalForm
+        title="添加记录"
+        open={modalAddRecord}
+        onFinish={async (formData) => {
+          console.log('onFinish---', formData)
+          message.success("提交成功")
+          return true
+        }}
+        onOpenChange={setModalAddRecord}>
+        <ProFormTextArea
+          name="uidData"
+          placeholder={"输入用户主页地址或24位用户ID，用 , 隔开"}
+        />
+      </ModalForm>
+    </>
   )
 }
 
 const filterData = (data: any[], params, sorter, filter) => {
-  console.log('filterData:', data, params, sorter, filter)
-  let filteredData = data;
+  let filteredData = data
 
   if (params.base) {
-    filteredData = filteredData.filter(item => item.nickname.includes(params.base) || item.redId.includes(params.base));
+    filteredData = filteredData.filter(
+      (item) =>
+        item.nickname.includes(params.base) || item.redId.includes(params.base)
+    )
   }
   if (params.location) {
-    filteredData = filteredData.filter(item => item.location.includes(params.location));
+    filteredData = filteredData.filter((item) =>
+      item.location.includes(params.location)
+    )
+  }
+  if (params.tags) {
+    filteredData = filteredData.filter((item) => {
+      if (Array.isArray(item.tags)) {
+        return item.tags.find(
+          (tag) =>
+            (typeof tag === "string" && tag.includes(params.tags)) ||
+            (typeof tag === "object" &&
+              tag.genderText &&
+              tag.genderText.includes(params.tags))
+        )
+      } else {
+        return false
+      }
+    })
   }
 
   if (params.dateRange) {
-    const [start, end] = params.dateRange;
-    filteredData = filteredData.filter(item => {
-      const itemDate = new Date(item.createTime);
-      return itemDate >= new Date(start) && itemDate <= new Date(end);
-    });
+    const [start, end] = params.dateRange
+    filteredData = filteredData.filter((item) => {
+      const itemDate = new Date(item.createTime)
+      return itemDate >= new Date(start) && itemDate <= new Date(end)
+    })
   }
 
   if (sorter.lenght > 0) {
-    const [sortKey, sortOrder] = Object.entries(sorter)[0];
+    const [sortKey, sortOrder] = Object.entries(sorter)[0]
     filteredData.sort((a, b) => {
-      const valueA = a[sortKey];
-      const valueB = b[sortKey];
-      if (valueA < valueB) return sortOrder === 'ascend' ? -1 : 1;
-      if (valueA > valueB) return sortOrder === 'ascend' ? 1 : -1;
-      return 0;
-    });
+      const valueA = a[sortKey]
+      const valueB = b[sortKey]
+      if (valueA < valueB) return sortOrder === "ascend" ? -1 : 1
+      if (valueA > valueB) return sortOrder === "ascend" ? 1 : -1
+      return 0
+    })
   }
 
-  return filteredData;
-};
+  return filteredData
+}
 
 export default UserPanel
