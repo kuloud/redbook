@@ -1,4 +1,5 @@
 import { sendToBackgroundViaRelay } from "@plasmohq/messaging"
+
 import { Store } from "~data/db"
 
 function handleResponse(response: any) {
@@ -16,10 +17,13 @@ const storage = {
       name: "storage",
       body: { method: "get", store, query }
     })
-    console.log('getItem ---', response)
     return handleResponse(response)
   },
-  getAllItems: async (store: Store, query?: string | IDBKeyRange, count?: number): Promise<any[]> => {
+  getAllItems: async (
+    store: Store,
+    query?: string | IDBKeyRange,
+    count?: number
+  ): Promise<any[]> => {
     const response = await sendToBackgroundViaRelay({
       name: "storage",
       body: { method: "getAll", store, query, count }
@@ -55,10 +59,13 @@ function createStorageNS(store: Store) {
     getItem: async (query: string | IDBKeyRange) => {
       return await storage.getItem(store, query)
     },
-    getAllItems: async (query?: string | IDBKeyRange, count?: number): Promise<any[]> => {
+    getAllItems: async (
+      query?: string | IDBKeyRange,
+      count?: number
+    ): Promise<any[]> => {
       return await storage.getAllItems(store, query, count)
     },
-    setItem: async (value: any, key?: string | IDBKeyRange) => {
+    setItem: async (value: any, key: string | IDBKeyRange) => {
       const response = (await storage.getItem(store, key)) || {}
       return storage.setItem(store, { ...response, ...value })
     },
@@ -74,7 +81,5 @@ function createStorageNS(store: Store) {
 export const userStorage = createStorageNS(Store.Profiles)
 
 export function clearAllStorages() {
-  ;[
-    userStorage
-  ].forEach((storage) => storage.clearStore())
+  ;[userStorage].forEach((storage) => storage.clearStore())
 }

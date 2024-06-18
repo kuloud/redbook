@@ -1,5 +1,6 @@
 import { ManOutlined, WomanOutlined } from "@ant-design/icons"
 import {
+  ActionType,
   ModalForm,
   ProForm,
   ProFormDateRangePicker,
@@ -20,9 +21,12 @@ import {
   Tag,
   Typography
 } from "antd"
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 
 import { Gender, UserInfo } from "~data/user"
+import { getUserInfo } from "~platform/xhs/api"
+import { extractUserId } from "~platform/xhs/utils"
+import { sleep } from "~utils/common"
 import { parseFormatNumber } from "~utils/parse"
 import { userStorage } from "~utils/storage"
 
@@ -30,6 +34,7 @@ const { Text } = Typography
 
 function UserPanel() {
   const [modalAddRecord, setModalAddRecord] = useState(false)
+  const actionRef = useRef<ActionType>()
 
   const columns: ProColumns<UserInfo>[] = [
     {
@@ -201,6 +206,7 @@ function UserPanel() {
   return (
     <>
       <ProTable<UserInfo>
+        actionRef={actionRef}
         columns={columns}
         expandable={{
           expandedRowRender: (record) => (
@@ -252,13 +258,57 @@ function UserPanel() {
         title="添加记录"
         open={modalAddRecord}
         onFinish={async (formData) => {
-          console.log('onFinish---', formData)
-          message.success("提交成功")
-          return true
+          console.log("onFinish---", formData)
+          const uidData: string = formData.uidData ?? ""
+          const uidFetchs = uidData
+            .split(",")
+            .map((item) => extractUserId(item))
+            .filter(Boolean)
+            .map((uid) => getUserInfo(uid))
+          const results = await Promise.allSettled(uidFetchs)
+          console.log("uidFetchs", results)
+          const successUserInfos = results.filter(
+            (item) => item.status === "fulfilled"
+          )
+          successUserInfos.forEach(
+            (result: PromiseFulfilledResult<UserInfo>) => {
+              const user = result.value
+              userStorage
+                .getItem(user.redId)
+                .then((userInfo: UserInfo | undefined) => {
+                  if (userInfo) {
+                    const newUserInfo = {
+                      ...userInfo,
+                      ...user,
+                      createTime: userInfo?.createTime ?? new Date()
+                    }
+                    userStorage.setItem(newUserInfo, user.redId)
+                  } else {
+                    userStorage.setItem(user, user.redId)
+                  }
+                })
+                .catch((reason) => {
+                  console.error(reason)
+                })
+            }
+          )
+          await sleep(500)
+          if (successUserInfos.length > 0) {
+            message.success(
+              `提交成功, 新增 ${successUserInfos.length} 条数据。`
+            )
+            actionRef.current?.reload()
+          } else {
+            message.error("提交失败")
+          }
+
+          return successUserInfos.length > 0
         }}
         onOpenChange={setModalAddRecord}>
         <ProFormTextArea
           name="uidData"
+          required
+          cacheForSwr={false}
           placeholder={"输入用户主页地址或24位用户ID，用 , 隔开"}
         />
       </ModalForm>

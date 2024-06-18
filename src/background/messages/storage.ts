@@ -1,12 +1,13 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging"
-import * as db from '~data/db'
+
+import * as db from "~data/db"
 
 const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
   const { store, query, value, key, count } = req.body
   try {
     switch (req.body.method) {
       case "get":
-        const item = await db.getItem(store, query) ?? {}
+        const item = (await db.getItem(store, query)) ?? {}
         res.send({
           code: 0,
           message: "success",
@@ -14,7 +15,7 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
         })
         break
       case "getAll":
-        const allItems = await db.getAllItems(store, query, count) ?? []
+        const allItems = (await db.getAllItems(store, query, count)) ?? []
         res.send({
           code: 0,
           message: "success",
