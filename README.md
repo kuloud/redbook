@@ -2,8 +2,12 @@
 
 - 首页
 <img src="./screenshots/screen.png" width="100%">
+
 - 手动添加用户
 <img src="./screenshots/screen1.png" width="100%">
+
+- 数据离线存储在插件页本地IndexedDB内
+<img src="./screenshots/screen2.png" width="100%">
 
 
 ### 功能列表:
@@ -12,7 +16,8 @@
 - [x] 小红书，用户数据检索
 - [x] 小红书，手动添加用户数据
 - [ ] 小红书，访问用户首页，自动归档笔记信息到本地数据库(Doing)
-- [ ] xxx
+- [ ] 小红书，批量刷新数据
+
 
 ### `Tips：`
 1. 项目常规功能完全免费开源，遵循 APL2。
