@@ -79,7 +79,8 @@ function createStorageNS(store: Store) {
 }
 
 export const userStorage = createStorageNS(Store.Profiles)
+export const noteStorage = createStorageNS(Store.Notes)
 
 export function clearAllStorages() {
-  ;[userStorage].forEach((storage) => storage.clearStore())
+  ;[userStorage, noteStorage].forEach((storage) => storage.clearStore())
 }

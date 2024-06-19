@@ -24,7 +24,8 @@ interface RedbookDB extends DBSchema {
 
 const initDB = async (): Promise<IDBPDatabase<RedbookDB>> => {
   return openDB<RedbookDB>(DB_NAME, DB_VERSION, {
-    upgrade(db) {
+    upgrade(db, oldVersion, newVersion) {
+      console.log("onUpgrade", oldVersion, newVersion)
       const profilesStore = db.createObjectStore(Store.Profiles, {
         keyPath: "redId"
       })

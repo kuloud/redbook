@@ -1,5 +1,6 @@
 import axios from "redaxios"
 
+import { Note } from "~data/note"
 import { Gender, Interaction, UserInfo } from "~data/user"
 
 import { truncateUrl } from "./utils"
@@ -99,7 +100,7 @@ export function parseUserInfoByDom(
   return null
 }
 
-export function parseNoteByDom(doc: Document, nid: string) {
+export function parseNoteByDom(doc: Document, nid: string): Note | null {
   const noteContainerElement = doc.querySelector(
     ".note-container#noteContainer"
   )
@@ -119,13 +120,13 @@ export function parseNoteByDom(doc: Document, nid: string) {
         ?.children[0]?.textContent?.trim() || ""
     const date =
       noteContentElement
-        .querySelector<HTMLSpanElement>(".bottom-container .date span")
+        .querySelector<HTMLSpanElement>(".bottom-container .date")
         ?.textContent?.trim() || ""
 
     const interactsElement = noteContainerElement.querySelector(
       ".interaction-container .engage-bar-container"
     )
-    // Mixed Content workarround
+
     const like =
       interactsElement
         .querySelector(".like-wrapper .count")
@@ -139,7 +140,9 @@ export function parseNoteByDom(doc: Document, nid: string) {
         .querySelector(".chat-wrapper .count")
         ?.textContent?.trim() || ""
 
-    console.log(">>>", title, desc, date, like, collect, chat)
+    const note = new Note(nid, title, desc, date, like, collect, chat)
+    console.log("--note->", note)
+    return note
   }
 
   return null
