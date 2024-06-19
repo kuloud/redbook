@@ -14,3 +14,15 @@ export const extractUserId = (data: string): string | null => {
     return match ? match[1] : null
   }
 }
+
+export const extractNoteId = (data: string): string | null => {
+  const regexUrl = /explore\/([a-f0-9]{24})(?:\?|$)/
+  const match = data.match(regexUrl)
+  if (match) {
+    return match[1]
+  } else {
+    const regexNid = /([a-f0-9]{24})/
+    const match = data.trim().match(regexNid)
+    return match ? match[1] : null
+  }
+}

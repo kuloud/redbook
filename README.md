@@ -1,12 +1,17 @@
 浏览器插件，自动归档管理自媒体平台的达人数据。适合小红书、知乎等平台，方便达人/大V关系运维。
 
 - 首页
+    * 字段过滤查询
+    * 按字段排序
 <img src="./screenshots/screen.png" width="100%">
 
+
 - 手动添加用户
+    * 支持用户主页链接、用户uid批量输入（用小写","字符隔开）
 <img src="./screenshots/screen1.png" width="100%">
 
 - 数据离线存储在插件页本地IndexedDB内
+    * 除了手动添加用户以及批量刷新（待添加功能），没有其它接口交互
 <img src="./screenshots/screen2.png" width="100%">
 
 
